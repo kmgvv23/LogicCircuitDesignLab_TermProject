@@ -2,6 +2,7 @@
 // Pattern Display Module
 // Sequentially displays LED pattern with speed control
 // Speed: 00=slow(1s), 01=medium(0.5s), 10=fast(0.25s)
+// Uses flattened 1D array for Verilog compatibility
 ////////////////////////////////////////////////////////////////////////////////
 
 module pattern_display (
@@ -9,7 +10,7 @@ module pattern_display (
     input wire rst,
     input wire start,
     input wire [1:0] speed,
-    input wire [7:0] pattern_seq [0:31],
+    input wire [255:0] pattern_seq_flat,
     input wire [4:0] pattern_length,
 
     output reg [7:0] led_out,
@@ -28,6 +29,14 @@ module pattern_display (
     reg [4:0] display_index;
     reg displaying;
     reg led_active;
+
+    // Extract pattern value from flattened array
+    function [2:0] get_pattern_led;
+        input [4:0] index;
+        begin
+            get_pattern_led = pattern_seq_flat[index*8 +: 3];
+        end
+    endfunction
 
     // Select interval based on speed
     always @(*) begin
@@ -60,7 +69,7 @@ module pattern_display (
                 counter <= 0;
                 led_active <= 1;
                 // Turn on first LED
-                led_out <= 8'b1 << pattern_seq[0][2:0];
+                led_out <= 8'b1 << get_pattern_led(0);
                 piezo_trigger <= 1;
             end else if (displaying) begin
                 counter <= counter + 1;
@@ -81,7 +90,7 @@ module pattern_display (
                         if (display_index < pattern_length - 1) begin
                             // Show next LED
                             led_active <= 1;
-                            led_out <= 8'b1 << pattern_seq[display_index + 1][2:0];
+                            led_out <= 8'b1 << get_pattern_led(display_index + 1);
                             piezo_trigger <= 1;
                         end else begin
                             // All LEDs displayed

@@ -2,6 +2,7 @@
 // Pattern Generator
 // Generates random LED pattern using LFSR
 // Pattern length = stage + 3 (Stage 1 = 4 LEDs, Stage 2 = 5 LEDs, etc.)
+// Uses flattened 1D array for Verilog compatibility
 ////////////////////////////////////////////////////////////////////////////////
 
 module pattern_generator (
@@ -10,7 +11,7 @@ module pattern_generator (
     input wire start,
     input wire [7:0] stage,
 
-    output reg [7:0] pattern_seq [0:31],  // Pattern sequence (max 32)
+    output reg [255:0] pattern_seq_flat,  // 32 x 8-bit flattened
     output reg [4:0] pattern_length,      // Actual pattern length
     output reg done
 );
@@ -20,8 +21,19 @@ module pattern_generator (
     reg [4:0] gen_count;
     reg generating;
 
+    // Internal array for easier manipulation
+    reg [7:0] pattern_seq [0:31];
+    integer i;
+
     // LFSR tap positions: 16, 14, 13, 11 (maximal length)
     wire feedback = lfsr[15] ^ lfsr[13] ^ lfsr[12] ^ lfsr[10];
+
+    // Pack array into flat output
+    always @(*) begin
+        for (i = 0; i < 32; i = i + 1) begin
+            pattern_seq_flat[i*8 +: 8] = pattern_seq[i];
+        end
+    end
 
     // State machine
     always @(posedge clk or posedge rst) begin
@@ -31,6 +43,8 @@ module pattern_generator (
             generating <= 0;
             done <= 0;
             pattern_length <= 0;
+            for (i = 0; i < 32; i = i + 1)
+                pattern_seq[i] <= 0;
         end else begin
             if (start && !generating) begin
                 // Start pattern generation

@@ -4,6 +4,7 @@
 // - Number buttons (1-8) add to sequence
 // - Back button removes last input
 // - Confirm button completes input
+// Uses flattened 1D array for Verilog compatibility
 ////////////////////////////////////////////////////////////////////////////////
 
 module input_handler (
@@ -15,7 +16,7 @@ module input_handler (
     input wire btn_back,
     input wire [4:0] pattern_length,
 
-    output reg [7:0] user_input [0:31],
+    output reg [255:0] user_input_flat,
     output reg [4:0] user_input_count,
     output reg input_complete
 );
@@ -35,7 +36,16 @@ module input_handler (
     assign btn_confirm_edge = btn_confirm & ~btn_confirm_prev;
     assign btn_back_edge = btn_back & ~btn_back_prev;
 
+    // Internal array for easier manipulation
+    reg [7:0] user_input [0:31];
     integer i;
+
+    // Pack array into flat output
+    always @(*) begin
+        for (i = 0; i < 32; i = i + 1) begin
+            user_input_flat[i*8 +: 8] = user_input[i];
+        end
+    end
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin

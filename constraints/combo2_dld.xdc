@@ -15,7 +15,7 @@ set_property -dict { PACKAGE_PIN E16 IOSTANDARD LVCMOS33 } [get_ports rst]
 ## Start Button (BTNU)
 set_property -dict { PACKAGE_PIN F15 IOSTANDARD LVCMOS33 } [get_ports btn_start]
 ## Confirm Button (BTNR)
-set_property -dict { PACKAGE_PIN R10 IOSTANDARD LVCMOS33 } [get_ports btn_confirm]
+set_property -dict { PACKAGE_PIN V10 IOSTANDARD LVCMOS33 } [get_ports btn_confirm]
 ## Back Button (BTNL)
 set_property -dict { PACKAGE_PIN T16 IOSTANDARD LVCMOS33 } [get_ports btn_back]
 

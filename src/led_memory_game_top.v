@@ -58,8 +58,8 @@ module led_memory_game_top (
     wire [2:0] lives;
     wire [7:0] high_score;
 
-    // Pattern signals
-    wire [7:0] pattern_seq [0:31];  // Up to 32 LED positions
+    // Pattern signals (flattened 1D array)
+    wire [255:0] pattern_seq_flat;  // 32 x 8-bit flattened
     wire [4:0] pattern_length;
     wire pattern_gen_start;
     wire pattern_gen_done;
@@ -69,8 +69,8 @@ module led_memory_game_top (
     wire pattern_display_done;
     wire [7:0] current_led;
 
-    // Input signals
-    wire [7:0] user_input [0:31];
+    // Input signals (flattened 1D array)
+    wire [255:0] user_input_flat;   // 32 x 8-bit flattened
     wire [4:0] user_input_count;
     wire input_complete;
 
@@ -170,7 +170,7 @@ module led_memory_game_top (
         .rst(system_reset),
         .start(pattern_gen_start),
         .stage(current_stage),
-        .pattern_seq(pattern_seq),
+        .pattern_seq_flat(pattern_seq_flat),
         .pattern_length(pattern_length),
         .done(pattern_gen_done)
     );
@@ -185,7 +185,7 @@ module led_memory_game_top (
         .rst(system_reset),
         .start(pattern_display_start),
         .speed(speed_select),
-        .pattern_seq(pattern_seq),
+        .pattern_seq_flat(pattern_seq_flat),
         .pattern_length(pattern_length),
         .led_out(current_led),
         .piezo_trigger(piezo_trigger),
@@ -207,7 +207,7 @@ module led_memory_game_top (
         .btn_confirm(debounced_confirm),
         .btn_back(debounced_back),
         .pattern_length(pattern_length),
-        .user_input(user_input),
+        .user_input_flat(user_input_flat),
         .user_input_count(user_input_count),
         .input_complete(input_complete)
     );
@@ -221,9 +221,9 @@ module led_memory_game_top (
         .clk(clk),
         .rst(system_reset),
         .start(check_start),
-        .pattern_seq(pattern_seq),
+        .pattern_seq_flat(pattern_seq_flat),
         .pattern_length(pattern_length),
-        .user_input(user_input),
+        .user_input_flat(user_input_flat),
         .user_input_count(user_input_count),
         .correct(answer_correct),
         .done(check_done)
@@ -285,7 +285,7 @@ module led_memory_game_top (
     seven_seg_array seg_arr (
         .clk(clk),
         .rst(system_reset),
-        .user_input(user_input),
+        .user_input_flat(user_input_flat),
         .input_count(user_input_count),
         .seg_cathode(seg_array_cathode),
         .seg_anode(seg_array_anode)

@@ -2,12 +2,13 @@
 // 8-Array 7-Segment Display Controller
 // Displays user input sequence (rightmost first, shifts left)
 // Uses multiplexing to drive 8 digits
+// Uses flattened 1D array for Verilog compatibility
 ////////////////////////////////////////////////////////////////////////////////
 
 module seven_seg_array (
     input wire clk,
     input wire rst,
-    input wire [7:0] user_input [0:31],
+    input wire [255:0] user_input_flat,
     input wire [4:0] input_count,
 
     output reg [7:0] seg_cathode,  // 8-bit cathode (segments a-g + dp)
@@ -17,6 +18,14 @@ module seven_seg_array (
     // Multiplexing counter (refresh ~1kHz, each digit displayed ~125Hz)
     reg [16:0] refresh_counter;
     reg [2:0] digit_select;
+
+    // Extract input value from flattened array
+    function [3:0] get_input_value;
+        input [4:0] index;
+        begin
+            get_input_value = user_input_flat[index*8 +: 4];
+        end
+    endfunction
 
     // 7-segment encoding (common anode: 0=on, 1=off)
     function [7:0] hex_to_7seg;
@@ -70,7 +79,7 @@ module seven_seg_array (
                     // This digit should display an input
                     integer display_index;
                     display_index = input_count - 1 - (7 - digit_select);
-                    seg_cathode <= hex_to_7seg(user_input[display_index][3:0]);
+                    seg_cathode <= hex_to_7seg(get_input_value(display_index));
                 end else begin
                     // This digit is blank
                     seg_cathode <= 8'b11111111;
