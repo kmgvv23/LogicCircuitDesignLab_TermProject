@@ -83,11 +83,21 @@ set_property -dict { PACKAGE_PIN K1 IOSTANDARD LVCMOS33 } [get_ports {seg_array_
 set_property -dict { PACKAGE_PIN K3 IOSTANDARD LVCMOS33 } [get_ports {seg_array_anode[6]}]
 set_property -dict { PACKAGE_PIN K5 IOSTANDARD LVCMOS33 } [get_ports {seg_array_anode[7]}]
 
-## Timer 7-Segment Display
-## Note: Timer uses the SAME 8-array 7-segment display
-## Digits 0-5 are for user input, Digits 6-7 are for timer (controlled by firmware)
-## Timer cathode and anode are SHARED with seg_array_cathode and seg_array_anode
-## No separate pins needed - handled by multiplexing in the design
+## 2-Digit 7-Segment Display (Timer)
+## Cathodes (segments a-g + dp) - Using remaining free pins
+## TODO: Verify these pins match your board's 2-digit 7-segment connections
+set_property -dict { PACKAGE_PIN R15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[0]}]
+set_property -dict { PACKAGE_PIN P14 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[1]}]
+set_property -dict { PACKAGE_PIN P15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[2]}]
+set_property -dict { PACKAGE_PIN N15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[3]}]
+set_property -dict { PACKAGE_PIN M15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[4]}]
+set_property -dict { PACKAGE_PIN L15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[5]}]
+set_property -dict { PACKAGE_PIN M16 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[6]}]
+set_property -dict { PACKAGE_PIN N14 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[7]}]
+
+## Anodes (digit select 0-1)
+set_property -dict { PACKAGE_PIN P17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[0]}]
+set_property -dict { PACKAGE_PIN R17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[1]}]
 
 ## Piezo Buzzer
 set_property -dict { PACKAGE_PIN Y21 IOSTANDARD LVCMOS33 } [get_ports piezo]
