@@ -84,18 +84,17 @@ set_property -dict { PACKAGE_PIN K3 IOSTANDARD LVCMOS33 } [get_ports {seg_array_
 set_property -dict { PACKAGE_PIN K5 IOSTANDARD LVCMOS33 } [get_ports {seg_array_anode[7]}]
 
 ## 2-Digit 7-Segment Display (Timer)
-## Cathodes (segments a-g + dp) - Using remaining free pins
-## TODO: Verify these pins match your board's 2-digit 7-segment connections
-set_property -dict { PACKAGE_PIN R15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[0]}]
-set_property -dict { PACKAGE_PIN P14 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[1]}]
-set_property -dict { PACKAGE_PIN P15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[2]}]
-set_property -dict { PACKAGE_PIN N15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[3]}]
-set_property -dict { PACKAGE_PIN M15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[4]}]
-set_property -dict { PACKAGE_PIN L15 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[5]}]
-set_property -dict { PACKAGE_PIN M16 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[6]}]
-set_property -dict { PACKAGE_PIN N14 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[7]}]
+## Cathodes (segments a-g + dp)
+set_property -dict { PACKAGE_PIN P1 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[0]}]  # SEG_A
+set_property -dict { PACKAGE_PIN P3 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[1]}]  # SEG_B
+set_property -dict { PACKAGE_PIN P7 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[2]}]  # SEG_C
+set_property -dict { PACKAGE_PIN N3 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[3]}]  # SEG_D
+set_property -dict { PACKAGE_PIN T5 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[4]}]  # SEG_E
+set_property -dict { PACKAGE_PIN R2 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[5]}]  # SEG_F
+set_property -dict { PACKAGE_PIN R4 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[6]}]  # SEG_G
+set_property -dict { PACKAGE_PIN R6 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[7]}]  # SEG_DP
 
-## Anodes (digit select 0-1)
+## Anodes (digit select 0-1) - TODO: Need actual anode pins from board pinout
 set_property -dict { PACKAGE_PIN P17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[0]}]
 set_property -dict { PACKAGE_PIN R17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[1]}]
 
