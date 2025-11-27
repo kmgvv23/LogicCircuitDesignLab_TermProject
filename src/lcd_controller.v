@@ -15,7 +15,7 @@ module lcd_controller (
     input wire answer_correct,
 
     output reg lcd_rs,
-    output reg lcd_rw,
+    output wire lcd_rw,
     output reg lcd_e,
     output reg [3:0] lcd_data
 );
@@ -42,6 +42,7 @@ module lcd_controller (
     reg [7:0] char_index;
     reg [7:0] display_buffer [0:31];  // 2 lines x 16 chars
     reg init_done;
+    integer i;  // Loop variable declaration
 
     // LCD RW is always 0 (write mode)
     assign lcd_rw = 1'b0;
@@ -58,7 +59,6 @@ module lcd_controller (
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             // Initialize display buffer with spaces
-            integer i;
             for (i = 0; i < 32; i = i + 1)
                 display_buffer[i] <= 8'h20;  // Space character
         end else begin
