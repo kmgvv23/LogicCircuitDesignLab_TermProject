@@ -1,6 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // 8-Array 7-Segment Display Controller
-// Displays user input sequence (rightmost first, shifts left)
+// Displays user input sequence AND timer
+// Digits 0-5: User input (rightmost first, shifts left)
+// Digits 6-7: Timer countdown (tens, ones)
 // Uses multiplexing to drive 8 digits
 // Uses flattened 1D array for Verilog compatibility
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,6 +12,8 @@ module seven_seg_array (
     input wire rst,
     input wire [255:0] user_input_flat,
     input wire [4:0] input_count,
+    input wire [3:0] timer_sec_ones,
+    input wire [3:0] timer_sec_tens,
 
     output reg [7:0] seg_cathode,  // 8-bit cathode (segments a-g + dp)
     output reg [7:0] seg_anode     // 8-bit anode (digit select)
@@ -61,6 +65,7 @@ module seven_seg_array (
     end
 
     // Display logic
+    // Layout: [Dig7:Timer_Tens][Dig6:Timer_Ones][Dig5-0:User_Input]
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             seg_cathode <= 8'b11111111;
@@ -69,24 +74,22 @@ module seven_seg_array (
             // Select current digit
             seg_anode <= ~(8'b1 << digit_select);
 
-            // Display input from right to left
-            // If we have N inputs, show them in positions [7-N+1 : 7]
-            if (digit_select < input_count && input_count > 0) begin
-                // Calculate which input to show
-                // Rightmost position (7) shows input[input_count-1]
-                // Position (7-k) shows input[input_count-1-k]
-                if (digit_select >= (8 - input_count)) begin
-                    // This digit should display an input
-                    integer display_index;
-                    display_index = input_count - 1 - (7 - digit_select);
-                    seg_cathode <= hex_to_7seg(get_input_value(display_index));
+            // Multiplex between timer (digits 6-7) and user input (digits 0-5)
+            if (digit_select == 3'd7) begin
+                // Leftmost digit: Timer tens
+                seg_cathode <= hex_to_7seg(timer_sec_tens);
+            end else if (digit_select == 3'd6) begin
+                // Second from left: Timer ones
+                seg_cathode <= hex_to_7seg(timer_sec_ones);
+            end else begin
+                // Digits 0-5: User input
+                if (digit_select < input_count) begin
+                    // Display the corresponding input value
+                    seg_cathode <= hex_to_7seg(get_input_value(digit_select));
                 end else begin
-                    // This digit is blank
+                    // No input yet for this digit, show blank
                     seg_cathode <= 8'b11111111;
                 end
-            end else begin
-                // No input yet, show blank
-                seg_cathode <= 8'b11111111;
             end
         end
     end
