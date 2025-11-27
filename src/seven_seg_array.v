@@ -27,22 +27,22 @@ module seven_seg_array (
         end
     endfunction
 
-    // 7-segment encoding (common anode: 0=on, 1=off)
+    // 7-segment encoding (common cathode: 1=on, 0=off)
     function [7:0] hex_to_7seg;
         input [3:0] hex;
         begin
             case (hex)
-                4'h0: hex_to_7seg = 8'b11000000;  // 0
-                4'h1: hex_to_7seg = 8'b11111001;  // 1
-                4'h2: hex_to_7seg = 8'b10100100;  // 2
-                4'h3: hex_to_7seg = 8'b10110000;  // 3
-                4'h4: hex_to_7seg = 8'b10011001;  // 4
-                4'h5: hex_to_7seg = 8'b10010010;  // 5
-                4'h6: hex_to_7seg = 8'b10000010;  // 6
-                4'h7: hex_to_7seg = 8'b11111000;  // 7
-                4'h8: hex_to_7seg = 8'b10000000;  // 8
-                4'h9: hex_to_7seg = 8'b10010000;  // 9
-                default: hex_to_7seg = 8'b11111111;  // blank
+                4'h0: hex_to_7seg = 8'b00111111;  // 0
+                4'h1: hex_to_7seg = 8'b00000110;  // 1
+                4'h2: hex_to_7seg = 8'b01011011;  // 2
+                4'h3: hex_to_7seg = 8'b01001111;  // 3
+                4'h4: hex_to_7seg = 8'b01100110;  // 4
+                4'h5: hex_to_7seg = 8'b01101101;  // 5
+                4'h6: hex_to_7seg = 8'b01111101;  // 6
+                4'h7: hex_to_7seg = 8'b00000111;  // 7
+                4'h8: hex_to_7seg = 8'b01111111;  // 8
+                4'h9: hex_to_7seg = 8'b01101111;  // 9
+                default: hex_to_7seg = 8'b00000000;  // blank
             endcase
         end
     endfunction
@@ -63,11 +63,11 @@ module seven_seg_array (
     // Display logic
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            seg_cathode <= 8'b11111111;
-            seg_anode <= 8'b11111111;
+            seg_cathode <= 8'b00000000;
+            seg_anode <= 8'b00000000;
         end else begin
-            // Select current digit
-            seg_anode <= ~(8'b1 << digit_select);
+            // Select current digit (active high for common cathode)
+            seg_anode <= (8'b1 << digit_select);
 
             // Display user input
             if (digit_select < input_count) begin
@@ -75,7 +75,7 @@ module seven_seg_array (
                 seg_cathode <= hex_to_7seg(get_input_value(digit_select));
             end else begin
                 // No input yet for this digit, show blank
-                seg_cathode <= 8'b11111111;
+                seg_cathode <= 8'b00000000;
             end
         end
     end
