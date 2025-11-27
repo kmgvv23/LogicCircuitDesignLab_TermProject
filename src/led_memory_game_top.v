@@ -39,9 +39,8 @@ module led_memory_game_top (
     output wire [7:0] seg_array_cathode,  // 7-segment cathodes (8 digits)
     output wire [7:0] seg_array_anode,    // 7-segment anodes (digit select)
 
-    // 2-Digit 7-Segment Display (for timer countdown)
-    output wire [7:0] seg_timer_cathode,  // 7-segment cathodes (2 digits)
-    output wire [1:0] seg_timer_anode,    // 7-segment anodes (digit select)
+    // Single 7-Segment Display (for timer countdown)
+    output wire [7:0] seg_timer_cathode,  // 7-segment cathodes (single digit)
 
     // Piezo Buzzer
     output wire piezo
@@ -293,7 +292,7 @@ module led_memory_game_top (
 
 
     ////////////////////////////////////////////////////////////////////////////
-    // 2-Digit 7-Segment Display (Timer countdown)
+    // Single 7-Segment Display (Timer countdown)
     ////////////////////////////////////////////////////////////////////////////
 
     seven_seg_timer seg_timer (
@@ -301,8 +300,7 @@ module led_memory_game_top (
         .rst(system_reset),
         .sec_ones(timer_sec_ones),
         .sec_tens(timer_sec_tens),
-        .seg_cathode(seg_timer_cathode),
-        .seg_anode(seg_timer_anode)
+        .seg_cathode(seg_timer_cathode)
     );
 
 

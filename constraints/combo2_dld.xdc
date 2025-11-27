@@ -83,8 +83,8 @@ set_property -dict { PACKAGE_PIN K1 IOSTANDARD LVCMOS33 } [get_ports {seg_array_
 set_property -dict { PACKAGE_PIN K3 IOSTANDARD LVCMOS33 } [get_ports {seg_array_anode[6]}]
 set_property -dict { PACKAGE_PIN K5 IOSTANDARD LVCMOS33 } [get_ports {seg_array_anode[7]}]
 
-## 2-Digit 7-Segment Display (Timer)
-## Cathodes (segments a-g + dp)
+## Single 7-Segment Display (Timer)
+## Cathodes (segments a-g + dp) - No anode needed for single digit
 set_property -dict { PACKAGE_PIN P1 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[0]}]  # SEG_A
 set_property -dict { PACKAGE_PIN P3 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[1]}]  # SEG_B
 set_property -dict { PACKAGE_PIN P7 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[2]}]  # SEG_C
@@ -93,10 +93,6 @@ set_property -dict { PACKAGE_PIN T5 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_
 set_property -dict { PACKAGE_PIN R2 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[5]}]  # SEG_F
 set_property -dict { PACKAGE_PIN R4 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[6]}]  # SEG_G
 set_property -dict { PACKAGE_PIN R6 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_cathode[7]}]  # SEG_DP
-
-## Anodes (digit select 0-1) - TODO: Need actual anode pins from board pinout
-set_property -dict { PACKAGE_PIN P17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[0]}]
-set_property -dict { PACKAGE_PIN R17 IOSTANDARD LVCMOS33 } [get_ports {seg_timer_anode[1]}]
 
 ## Piezo Buzzer
 set_property -dict { PACKAGE_PIN Y21 IOSTANDARD LVCMOS33 } [get_ports piezo]
