@@ -58,34 +58,42 @@ module seg_input_view(
     end
 
     // Select digit based on scan position and input length (right-aligned)
-    always @(*) begin
-        case (scan_pos)
-            3'd0: current_digit = (input_length >= 8) ? input_7 : 4'd10;
-            3'd1: current_digit = (input_length >= 7) ? input_6 : 4'd10;
-            3'd2: current_digit = (input_length >= 6) ? input_5 : 4'd10;
-            3'd3: current_digit = (input_length >= 5) ? input_4 : 4'd10;
-            3'd4: current_digit = (input_length >= 4) ? input_3 : 4'd10;
-            3'd5: current_digit = (input_length >= 3) ? input_2 : 4'd10;
-            3'd6: current_digit = (input_length >= 2) ? input_1 : 4'd10;
-            3'd7: current_digit = (input_length >= 1) ? input_0 : 4'd10;
-            default: current_digit = 4'd10;
-        endcase
-    end
+    // Use registered outputs to avoid glitches
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            current_digit <= 4'd10;
+            seg_data <= 8'b11111111;  // All off
+            seg_sel <= 8'b11111111;   // None selected
+        end else begin
+            // Select current digit
+            case (scan_pos)
+                3'd0: current_digit <= (input_length >= 8) ? input_7 : 4'd10;
+                3'd1: current_digit <= (input_length >= 7) ? input_6 : 4'd10;
+                3'd2: current_digit <= (input_length >= 6) ? input_5 : 4'd10;
+                3'd3: current_digit <= (input_length >= 5) ? input_4 : 4'd10;
+                3'd4: current_digit <= (input_length >= 4) ? input_3 : 4'd10;
+                3'd5: current_digit <= (input_length >= 3) ? input_2 : 4'd10;
+                3'd6: current_digit <= (input_length >= 2) ? input_1 : 4'd10;
+                3'd7: current_digit <= (input_length >= 1) ? input_0 : 4'd10;
+                default: current_digit <= 4'd10;
+            endcase
 
-    // Output segment data and selection
-    always @(*) begin
-        seg_data = decode_seg(current_digit);
-        case (scan_pos)
-            3'd0: seg_sel = 8'b11111110;  // S0
-            3'd1: seg_sel = 8'b11111101;  // S1
-            3'd2: seg_sel = 8'b11111011;  // S2
-            3'd3: seg_sel = 8'b11110111;  // S3
-            3'd4: seg_sel = 8'b11101111;  // S4
-            3'd5: seg_sel = 8'b11011111;  // S5
-            3'd6: seg_sel = 8'b10111111;  // S6
-            3'd7: seg_sel = 8'b01111111;  // S7
-            default: seg_sel = 8'b11111111;
-        endcase
+            // Decode segment data
+            seg_data <= decode_seg(current_digit);
+
+            // Select digit position
+            case (scan_pos)
+                3'd0: seg_sel <= 8'b11111110;  // S0
+                3'd1: seg_sel <= 8'b11111101;  // S1
+                3'd2: seg_sel <= 8'b11111011;  // S2
+                3'd3: seg_sel <= 8'b11110111;  // S3
+                3'd4: seg_sel <= 8'b11101111;  // S4
+                3'd5: seg_sel <= 8'b11011111;  // S5
+                3'd6: seg_sel <= 8'b10111111;  // S6
+                3'd7: seg_sel <= 8'b01111111;  // S7
+                default: seg_sel <= 8'b11111111;
+            endcase
+        end
     end
 
 endmodule

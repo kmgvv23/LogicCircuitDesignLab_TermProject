@@ -66,7 +66,11 @@ module seg_timer(
     end
 
     always @(*) begin
-        seg_data = decode_seg(count);
+        if (running || timeout) begin
+            seg_data = decode_seg(count);
+        end else begin
+            seg_data = 8'b11111111;  // Blank when not running
+        end
     end
 
 endmodule
