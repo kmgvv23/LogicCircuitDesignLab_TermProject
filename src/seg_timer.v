@@ -15,22 +15,22 @@ module seg_timer(
     reg [26:0] counter;
     reg running;
 
-    // 7-segment decoder (Common Anode: 0=ON, 1=OFF)
+    // 7-segment decoder (Common Cathode: 1=ON, 0=OFF)
     function [7:0] decode_seg;
         input [3:0] digit;
         begin
             case (digit)
-                4'd0: decode_seg = 8'b11000000;  // 0
-                4'd1: decode_seg = 8'b11111001;  // 1
-                4'd2: decode_seg = 8'b10100100;  // 2
-                4'd3: decode_seg = 8'b10110000;  // 3
-                4'd4: decode_seg = 8'b10011001;  // 4
-                4'd5: decode_seg = 8'b10010010;  // 5
-                4'd6: decode_seg = 8'b10000010;  // 6
-                4'd7: decode_seg = 8'b11111000;  // 7
-                4'd8: decode_seg = 8'b10000000;  // 8
-                4'd9: decode_seg = 8'b10010000;  // 9
-                default: decode_seg = 8'b11111111;  // Blank
+                4'd0: decode_seg = 8'b00111111;  // 0
+                4'd1: decode_seg = 8'b00000110;  // 1
+                4'd2: decode_seg = 8'b01011011;  // 2
+                4'd3: decode_seg = 8'b01001111;  // 3
+                4'd4: decode_seg = 8'b01100110;  // 4
+                4'd5: decode_seg = 8'b01101101;  // 5
+                4'd6: decode_seg = 8'b01111101;  // 6
+                4'd7: decode_seg = 8'b00000111;  // 7
+                4'd8: decode_seg = 8'b01111111;  // 8
+                4'd9: decode_seg = 8'b01101111;  // 9
+                default: decode_seg = 8'b00000000;  // Blank
             endcase
         end
     endfunction
@@ -69,7 +69,7 @@ module seg_timer(
         if (running || timeout) begin
             seg_data = decode_seg(count);
         end else begin
-            seg_data = 8'b11111111;  // Blank when not running
+            seg_data = 8'b00000000;  // Blank when not running (Common Cathode)
         end
     end
 

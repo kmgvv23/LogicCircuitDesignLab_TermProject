@@ -22,22 +22,22 @@ module seg_input_view(
     reg [2:0] scan_pos;
     reg [3:0] current_digit;
 
-    // 7-segment decoder (Common Anode: 0=ON, 1=OFF)
+    // 7-segment decoder (Common Cathode: 1=ON, 0=OFF)
     function [7:0] decode_seg;
         input [3:0] digit;
         begin
             case (digit)
-                4'd0: decode_seg = 8'b11000000;
-                4'd1: decode_seg = 8'b11111001;
-                4'd2: decode_seg = 8'b10100100;
-                4'd3: decode_seg = 8'b10110000;
-                4'd4: decode_seg = 8'b10011001;
-                4'd5: decode_seg = 8'b10010010;
-                4'd6: decode_seg = 8'b10000010;
-                4'd7: decode_seg = 8'b11111000;
-                4'd8: decode_seg = 8'b10000000;
-                4'd9: decode_seg = 8'b10010000;
-                default: decode_seg = 8'b11111111;  // Blank
+                4'd0: decode_seg = 8'b00111111;
+                4'd1: decode_seg = 8'b00000110;
+                4'd2: decode_seg = 8'b01011011;
+                4'd3: decode_seg = 8'b01001111;
+                4'd4: decode_seg = 8'b01100110;
+                4'd5: decode_seg = 8'b01101101;
+                4'd6: decode_seg = 8'b01111101;
+                4'd7: decode_seg = 8'b00000111;
+                4'd8: decode_seg = 8'b01111111;
+                4'd9: decode_seg = 8'b01101111;
+                default: decode_seg = 8'b00000000;  // Blank
             endcase
         end
     endfunction
@@ -62,8 +62,8 @@ module seg_input_view(
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             current_digit <= 4'd10;
-            seg_data <= 8'b11111111;  // All off
-            seg_sel <= 8'b11111111;   // None selected
+            seg_data <= 8'b00000000;  // All off (Common Cathode)
+            seg_sel <= 8'b00000000;   // None selected (Active HIGH)
         end else begin
             // Select current digit
             case (scan_pos)
@@ -81,17 +81,17 @@ module seg_input_view(
             // Decode segment data
             seg_data <= decode_seg(current_digit);
 
-            // Select digit position
+            // Select digit position (Active HIGH)
             case (scan_pos)
-                3'd0: seg_sel <= 8'b11111110;  // S0
-                3'd1: seg_sel <= 8'b11111101;  // S1
-                3'd2: seg_sel <= 8'b11111011;  // S2
-                3'd3: seg_sel <= 8'b11110111;  // S3
-                3'd4: seg_sel <= 8'b11101111;  // S4
-                3'd5: seg_sel <= 8'b11011111;  // S5
-                3'd6: seg_sel <= 8'b10111111;  // S6
-                3'd7: seg_sel <= 8'b01111111;  // S7
-                default: seg_sel <= 8'b11111111;
+                3'd0: seg_sel <= 8'b00000001;  // S0
+                3'd1: seg_sel <= 8'b00000010;  // S1
+                3'd2: seg_sel <= 8'b00000100;  // S2
+                3'd3: seg_sel <= 8'b00001000;  // S3
+                3'd4: seg_sel <= 8'b00010000;  // S4
+                3'd5: seg_sel <= 8'b00100000;  // S5
+                3'd6: seg_sel <= 8'b01000000;  // S6
+                3'd7: seg_sel <= 8'b10000000;  // S7
+                default: seg_sel <= 8'b00000000;
             endcase
         end
     end
