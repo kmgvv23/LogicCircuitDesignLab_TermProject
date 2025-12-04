@@ -212,7 +212,7 @@ module memory_game_top(
         .done(player_done)
     );
 
-    assign led = led_out;
+    assign led = led_out | fsm_state;  // Show both pattern AND FSM state on LEDs
 
     // Piezo sound controller
     piezo_sound piezo_inst (
