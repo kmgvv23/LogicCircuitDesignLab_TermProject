@@ -41,24 +41,14 @@ module fsm_controller(
 
     reg [3:0] state, next_state;
     reg [31:0] delay_counter;
-    reg start_btn_prev, confirm_btn_prev;
-    reg start_pressed, confirm_pressed;
 
-    // Edge detection for buttons
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            start_btn_prev <= 1'b1;
-            confirm_btn_prev <= 1'b1;
-        end else begin
-            start_btn_prev <= start_btn;
-            confirm_btn_prev <= confirm_btn;
-        end
-    end
+    // Button inputs are already edge-detected by debouncer
+    // Just use them directly
+    wire start_pressed;
+    wire confirm_pressed;
 
-    always @(*) begin
-        start_pressed = (start_btn_prev == 1'b1) && (start_btn == 1'b0);
-        confirm_pressed = (confirm_btn_prev == 1'b1) && (confirm_btn == 1'b0);
-    end
+    assign start_pressed = start_btn;      // Already an edge pulse
+    assign confirm_pressed = confirm_btn;  // Already an edge pulse
 
     // State machine
     always @(posedge clk or posedge rst) begin

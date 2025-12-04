@@ -114,8 +114,8 @@ module memory_game_top(
         .clk(clk),
         .rst(rst),
         .game_enable(game_enable),
-        .start_btn(btn_db[9]),
-        .confirm_btn(btn_db[11]),
+        .start_btn(btn_edge[9]),   // Use edge signal
+        .confirm_btn(btn_edge[11]), // Use edge signal
         .timeout(timeout),
         .player_done(player_done),
         .match_result(match_result),

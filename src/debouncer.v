@@ -53,8 +53,8 @@ module debouncer #(
             btn_edge <= 1'b0;
         end else begin
             btn_out <= btn_state;
-            btn_prev <= btn_state;
             btn_edge <= (btn_prev == 1'b1) && (btn_state == 1'b0);  // Falling edge (pressed)
+            btn_prev <= btn_state;  // Update previous state AFTER edge detection
         end
     end
 
