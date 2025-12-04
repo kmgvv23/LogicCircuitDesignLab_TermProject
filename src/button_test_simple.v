@@ -1,5 +1,5 @@
 // button_test_simple.v
-// Ultra-simple button test - bypasses all debouncing
+// Ultra-simple button test - CORRECTED for Active HIGH buttons
 module button_test_simple(
     input clk,
     input [7:0] dip_sw,
@@ -18,14 +18,14 @@ module button_test_simple(
     output rgb_b
 );
 
-    // Direct button to LED mapping (no debouncing)
-    // Buttons are active LOW, LEDs light when LOW
-    assign led = ~btn[7:0];  // Buttons 1-8 to LEDs
+    // CORRECTED: Buttons are ACTIVE HIGH (pressed = 1, not pressed = 0)
+    assign led = btn[7:0];  // Direct mapping, no inversion
 
     // Show button 10 (start) on RGB LED
-    assign rgb_r = btn[9];   // Green when pressed (active low)
-    assign rgb_g = ~btn[9];
-    assign rgb_b = 1'b1;
+    // RGB LED is ACTIVE LOW (0 = ON)
+    assign rgb_r = ~btn[9];  // Red OFF when pressed
+    assign rgb_g = btn[9];   // Green ON when pressed
+    assign rgb_b = 1'b1;     // Blue always OFF
 
     // Turn off 7-segments and LCD
     assign seg_timer_data = 8'b11111111;
