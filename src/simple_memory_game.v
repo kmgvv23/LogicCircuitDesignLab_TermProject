@@ -93,9 +93,12 @@ module simple_memory_game(
     endfunction
 
     // Display input on 7-segment (right aligned)
+    // input_len=1: show at position 7 (rightmost)
+    // input_len=2: show at positions 6-7
+    // input_len=3: show at positions 5-7, etc.
     always @(*) begin
-        if (scan_pos < input_len) begin
-            seg_arr_data = seg_decode(user_input[scan_pos]);
+        if (input_len > 0 && scan_pos >= (8 - input_len)) begin
+            seg_arr_data = seg_decode(user_input[scan_pos - (8 - input_len)]);
             seg_arr_sel = (8'b00000001 << scan_pos);
         end else begin
             seg_arr_data = 8'b00000000;
