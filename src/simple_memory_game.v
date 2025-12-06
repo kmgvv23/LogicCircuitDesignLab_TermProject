@@ -63,46 +63,59 @@ module simple_memory_game(
             btn_prev <= btn;
     end
 
-    // 7-segment display for input
+    // 7-segment display for input (COMPLETELY REWRITTEN)
     reg [16:0] scan_counter;
     reg [2:0] scan_pos;
+    reg [3:0] display_idx;  // Which user_input to show
 
-    always @(posedge clk) begin
-        if (scan_counter < 100000)
-            scan_counter <= scan_counter + 1;
-        else begin
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
             scan_counter <= 0;
-            scan_pos <= scan_pos + 1;
+            scan_pos <= 0;
+        end else begin
+            if (scan_counter < 50000) begin  // ~2kHz scan rate
+                scan_counter <= scan_counter + 1;
+            end else begin
+                scan_counter <= 0;
+                scan_pos <= scan_pos + 1;  // 0-7
+            end
         end
     end
 
-    // 7-seg decoder (Common Cathode)
+    // 7-seg decoder (Common Cathode: 1=ON)
     function [7:0] seg_decode;
         input [2:0] num;
         case (num)
-            3'd0: seg_decode = 8'b00111111;
-            3'd1: seg_decode = 8'b00000110;
-            3'd2: seg_decode = 8'b01011011;
-            3'd3: seg_decode = 8'b01001111;
-            3'd4: seg_decode = 8'b01100110;
-            3'd5: seg_decode = 8'b01101101;
-            3'd6: seg_decode = 8'b01111101;
-            3'd7: seg_decode = 8'b00000111;
+            3'd0: seg_decode = 8'b00111111;  // 0
+            3'd1: seg_decode = 8'b00000110;  // 1
+            3'd2: seg_decode = 8'b01011011;  // 2
+            3'd3: seg_decode = 8'b01001111;  // 3
+            3'd4: seg_decode = 8'b01100110;  // 4
+            3'd5: seg_decode = 8'b01101101;  // 5
+            3'd6: seg_decode = 8'b01111101;  // 6
+            3'd7: seg_decode = 8'b00000111;  // 7
             default: seg_decode = 8'b00000000;
         endcase
     endfunction
 
-    // Display input on 7-segment (right aligned)
-    // input_len=1: show at position 7 (rightmost)
-    // input_len=2: show at positions 6-7
-    // input_len=3: show at positions 5-7, etc.
-    always @(*) begin
-        if (input_len > 0 && scan_pos >= (8 - input_len)) begin
-            seg_arr_data = seg_decode(user_input[scan_pos - (8 - input_len)]);
-            seg_arr_sel = (8'b00000001 << scan_pos);
+    // Right-aligned display logic (registered)
+    // input_len=1: position 7 shows user_input[0]
+    // input_len=2: position 6 shows user_input[0], position 7 shows user_input[1]
+    // input_len=3: positions 5,6,7 show user_input[0,1,2]
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            seg_arr_data <= 8'b00000000;
+            seg_arr_sel <= 8'b00000000;
         end else begin
-            seg_arr_data = 8'b00000000;
-            seg_arr_sel = 8'b00000000;
+            // Calculate which input to display at current scan position
+            if (input_len > 0 && scan_pos >= (8 - input_len)) begin
+                display_idx = scan_pos - (8 - input_len);
+                seg_arr_data <= seg_decode(user_input[display_idx]);
+                seg_arr_sel <= (8'b00000001 << scan_pos);
+            end else begin
+                seg_arr_data <= 8'b00000000;
+                seg_arr_sel <= 8'b00000000;
+            end
         end
     end
 
@@ -209,15 +222,20 @@ module simple_memory_game(
                 CHECK: begin
                     led <= 8'b01000000;  // LED 7 = checking
 
-                    // Compare
+                    // Compare (FIXED: unrolled comparison)
                     match = 1;
                     if (input_len != pattern_len) begin
                         match = 0;
                     end else begin
-                        for (i = 0; i < pattern_len; i = i + 1) begin
-                            if (pattern[i] != user_input[i])
-                                match = 0;
-                        end
+                        // Unrolled comparison for all possible lengths
+                        if (pattern_len >= 1 && pattern[0] != user_input[0]) match = 0;
+                        if (pattern_len >= 2 && pattern[1] != user_input[1]) match = 0;
+                        if (pattern_len >= 3 && pattern[2] != user_input[2]) match = 0;
+                        if (pattern_len >= 4 && pattern[3] != user_input[3]) match = 0;
+                        if (pattern_len >= 5 && pattern[4] != user_input[4]) match = 0;
+                        if (pattern_len >= 6 && pattern[5] != user_input[5]) match = 0;
+                        if (pattern_len >= 7 && pattern[6] != user_input[6]) match = 0;
+                        if (pattern_len >= 8 && pattern[7] != user_input[7]) match = 0;
                     end
 
                     if (match)
