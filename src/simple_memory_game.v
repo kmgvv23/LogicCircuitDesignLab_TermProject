@@ -115,16 +115,16 @@ module simple_memory_game(
             pattern_idx <= 0;
             input_len <= 0;
             counter <= 0;
-            rgb_r <= 1;
-            rgb_g <= 1;
-            rgb_b <= 1;
+            rgb_r <= 0;
+            rgb_g <= 0;
+            rgb_b <= 0;
         end else begin
             case (state)
                 IDLE: begin
                     led <= 8'b00000001;  // LED 1 = IDLE
-                    rgb_r <= 1;
-                    rgb_g <= 1;
-                    rgb_b <= 1;
+                    rgb_r <= 0;
+                    rgb_g <= 0;
+                    rgb_b <= 0;
                     if (btn_pressed[9]) begin  // START
                         state <= GEN_PATTERN;
                         pattern_idx <= 0;
@@ -144,8 +144,11 @@ module simple_memory_game(
                 end
 
                 SHOW_PATTERN: begin
-                    if (counter < 50_000_000) begin  // 500ms
+                    if (counter < 40_000_000) begin  // 400ms ON
                         led <= (8'b00000001 << pattern[pattern_idx]);
+                        counter <= counter + 1;
+                    end else if (counter < 50_000_000) begin  // 100ms OFF
+                        led <= 8'b00000000;
                         counter <= counter + 1;
                     end else begin
                         counter <= 0;
@@ -224,9 +227,9 @@ module simple_memory_game(
 
                 CORRECT: begin
                     led <= 8'b11111111;  // All LEDs
-                    rgb_r <= 1;
-                    rgb_g <= 0;  // Green
-                    rgb_b <= 1;
+                    rgb_r <= 0;
+                    rgb_g <= 1;  // Green (Active HIGH)
+                    rgb_b <= 0;
 
                     if (counter < 100_000_000) begin  // 1 sec
                         counter <= counter + 1;
@@ -239,9 +242,9 @@ module simple_memory_game(
 
                 WRONG: begin
                     led <= 8'b00000000;  // All off
-                    rgb_r <= 0;  // Red
-                    rgb_g <= 1;
-                    rgb_b <= 1;
+                    rgb_r <= 1;  // Red (Active HIGH)
+                    rgb_g <= 0;
+                    rgb_b <= 0;
 
                     if (counter < 100_000_000) begin  // 1 sec
                         counter <= counter + 1;
