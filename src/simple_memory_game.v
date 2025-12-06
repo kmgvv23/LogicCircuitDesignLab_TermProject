@@ -66,7 +66,6 @@ module simple_memory_game(
     // 7-segment display for input (COMPLETELY REWRITTEN)
     reg [16:0] scan_counter;
     reg [2:0] scan_pos;
-    reg [3:0] display_idx;  // Which user_input to show
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
@@ -98,7 +97,7 @@ module simple_memory_game(
         endcase
     endfunction
 
-    // Right-aligned display logic (registered)
+    // Right-aligned display logic (FIXED: proper indexing)
     // input_len=1: position 7 shows user_input[0]
     // input_len=2: position 6 shows user_input[0], position 7 shows user_input[1]
     // input_len=3: positions 5,6,7 show user_input[0,1,2]
@@ -107,20 +106,24 @@ module simple_memory_game(
             seg_arr_data <= 8'b00000000;
             seg_arr_sel <= 8'b00000000;
         end else begin
-            // Calculate which input to display at current scan position
-            if (input_len > 0 && scan_pos >= (8 - input_len)) begin
-                display_idx = scan_pos - (8 - input_len);
-                seg_arr_data <= seg_decode(user_input[display_idx]);
-                seg_arr_sel <= (8'b00000001 << scan_pos);
-            end else begin
-                seg_arr_data <= 8'b00000000;
-                seg_arr_sel <= 8'b00000000;
-            end
+            // Only display on valid positions
+            seg_arr_sel <= (8'b00000001 << scan_pos);
+
+            // Calculate what to show based on scan_pos and input_len
+            case (scan_pos)
+                3'd0: seg_arr_data <= (input_len >= 8) ? seg_decode(user_input[0]) : 8'b00000000;
+                3'd1: seg_arr_data <= (input_len >= 7) ? seg_decode(user_input[input_len-7]) : 8'b00000000;
+                3'd2: seg_arr_data <= (input_len >= 6) ? seg_decode(user_input[input_len-6]) : 8'b00000000;
+                3'd3: seg_arr_data <= (input_len >= 5) ? seg_decode(user_input[input_len-5]) : 8'b00000000;
+                3'd4: seg_arr_data <= (input_len >= 4) ? seg_decode(user_input[input_len-4]) : 8'b00000000;
+                3'd5: seg_arr_data <= (input_len >= 3) ? seg_decode(user_input[input_len-3]) : 8'b00000000;
+                3'd6: seg_arr_data <= (input_len >= 2) ? seg_decode(user_input[input_len-2]) : 8'b00000000;
+                3'd7: seg_arr_data <= (input_len >= 1) ? seg_decode(user_input[input_len-1]) : 8'b00000000;
+            endcase
         end
     end
 
     // Main FSM
-    integer i;
     reg match;
 
     always @(posedge clk or posedge rst) begin
@@ -255,8 +258,10 @@ module simple_memory_game(
                     if (counter < 100_000_000) begin  // 1 sec
                         counter <= counter + 1;
                     end else begin
+                        // Infinite play: stay at 8 patterns after reaching max
                         if (pattern_len < 8)
                             pattern_len <= pattern_len + 1;
+                        // else keep playing at pattern_len=8 forever
                         state <= IDLE;
                     end
                 end
